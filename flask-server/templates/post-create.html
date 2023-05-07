@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script>
+        if (signed_in == false)
+        {
+            window.history.back();
+        }
+
+        $.ajax(
+        {
+            type: "GET",
+            url: "/user/token",
+            dataType: 'json',
+            headers: {
+                ContentType: 'application/json',
+                Accepts: 'application/json',
+                Authorization: get_token()
+            },
+            async: true,
+            success: function(response)
+            {
+                const json = JSON.parse(JSON.stringify(response));
+                
+                username = json["username"];
+                $("#post-username").text(username);
+                admin = json["admin"]
+                $("#post-user-type").text(admin == 1 ? "Admin" : "Member")
+            },
+            error: function(xhr, status, error)
+            {
+                alert("Connection Error: Failed to get user");
+            }
+        })
+
+        function create()
+        {
+            if (get_token() == null)
+            {
+                return;
+            }
+            
+            $("#invalid-post-text").hide();
+
+            var post_title = $("#post-title").val();
+            var post_content = $("#post-content").val();
+
+            if (get_stripped_string(post_title).length < 5)
+            {
+                $("#invalid-post-text").html("&#8226; Title must be 5 characters or more");
+                $("#invalid-post-text").show();
+                return;
+            }
+            else if (get_stripped_string(post_content).length < 5)
+            {
+                $("#invalid-post-text").html("&#8226; Content must be 5 characters or more");
+                $("#invalid-post-text").show();
+                return;
+            }
+
+            data = new Object();
+            data.title = post_title;
+            data.content = post_content;
+
+            $.ajax(
+            {
+                type: "PUT",
+                url: "/post/create/{{ forum_details.forum_id }}",
+                data: JSON.stringify(data),
+                dataType: 'json',
+                headers: {
+                    ContentType: 'application/json',
+                    Accepts: 'application/json',
+                    Authorization: get_token()
+                },
+                async: true,
+                success: function(response)
+                {
+                    const json = JSON.parse(JSON.stringify(response));
+                    if (json.hasOwnProperty('action'))
+                    {
+                        if (json["action"] == 0)
+                        {
+                            $("#invalid-post-text").html("&#8226; " + json["response"]);
+                            $("#invalid-post-text").show();
+                        }
+                        else
+                        {
+                            window.location = json["url"];
+                        }
+                    }
+                    else
+                    {
+                        alert("Failed to create post")
+                    }
+                },
+                error: function(xhr, status, error)
+                {
+                    alert("Connection Error: Failed to post");
+                }
+            })
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="background: #212129;padding-top: 12px;padding-bottom: 12px;margin-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col-xxl-7" style="width: 100%;">
+                <a class="breadcrumb-link" href="/forums" style="padding-right: 4px;">
+                    <span class="breadcrumb-name">
+                        Home
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-chevron-right" style="font-size: 20px;padding-left: 5px;padding-bottom: 2px;color: rgb(176,189,211);">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                        </svg>
+                    </span>
+                </a>
+                <a class="breadcrumb-forum-name" href="/forum/{{ forum_details.forum_id }}" style="padding-right: 4px; display: inline; font-size: 17px;">{{ forum_details.name }}</a>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="background: #212129;padding-top: 12px;padding-bottom: 12px;margin-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col-xxl-7" style="width: 100%;">
+                <p style="font-size: 26px; text-align: left;margin-left: 12px;margin-right: 12px;margin-bottom: 0px;">Start new topic</p>
+                <p style="text-align: left;margin-left: 12px;margin-right: 12px;margin-bottom: 12px;">Enter your topic title...</p>
+                <input id="post-title" type="text" style="width: 98%;margin-right: 16px;margin-left: 12px;background: rgba(255,255,255,0);border-color: rgb(176,189,211);padding-left: 12px;padding-top: 12px;color: rgb(255,255,255);margin-bottom: 16px;padding-bottom: 12px;font-size: 26px;" placeholder="Title goes here...">
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-right: 0px;">
+        <div class="row mx-auto" style="margin-bottom: 12px;margin-left: 40px;margin-right: 40px;">
+            <div class="col" style="width: 10%;max-width: 10%;padding-top: 12px;">
+                <div class="row">
+                    <div class="col" style="text-align: center;"><img src="{{ url_for('static', filename='img/brands/dot.png') }}" width="60" height="60"></div>
+                </div>
+                <div class="row">
+                    <div class="col" style="text-align: center;">
+                        <p id="post-username" style="text-align: center;margin-bottom: 0px;color: rgb(255,255,255);"></p>
+                        <p id="post-user-type" style="text-align: center;margin-bottom: 0px;color: rgb(176,189,211);"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col" style="background: #212129;text-align: right;">
+                        <p style="text-align: left;margin-top: 12px;margin-left: 12px;margin-right: 12px;margin-bottom: 12px;">...then  your topic content...</p>
+                        <textarea id="post-content" style="width: 98%;margin-right: 16px;margin-left: 12px;min-height: 150px;background: rgba(255,255,255,0);border-color: rgb(176,189,211);padding-left: 12px;color: rgb(255,255,255);padding-top: 12px;margin-bottom: 6px;" placeholder="Topic content goes here..."></textarea>
+                        <p id="invalid-post-text" class="form-control" style="background-color: #FF7777; color:white; border-color: #FF7777; text-align: left; margin-right: 12px; margin-left: 12px; width: 98%; display: none;">&#8226; Error</p>
+                        <p style="text-align: right;margin-left: 12px;margin-right: 12px;margin-bottom: 6px;">...and Post it! when you're ready!</p>
+                        <a id="post-topic" class="btn btn-primary shadow" role="button" href="javascript:create();" style="margin-right: 12px;background: rgb(55, 99, 244);margin-bottom: 16px;">Post it!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,12 @@
+a {
+  color: white;
+  font-size: 17px;
+}
+
+a:hover {
+  color: var(--bs-gray-500);
+}
+
+.input-error {
+  border: 1px solid red
+}

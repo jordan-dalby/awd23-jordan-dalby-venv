@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+<script>
+    // reference: https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
+    // reason: force reload the page when navigating using history, ensures that the page is up to date
+    if(performance.navigation.type == 2)
+    {
+        location.reload(true);
+    }
+
+    $(document).ready(function()
+    {
+        if (get_token() != null)
+        {
+            $("#start-new-topic-button").show();
+        }
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="background: #212129;padding-top: 12px;padding-bottom: 12px;margin-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col" style="width: 100%;">
+                <a class="breadcrumb-link" href="/forums" style="padding-right: 4px;">
+                    <span class="breadcrumb-name">
+                        Home
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-chevron-right" style="font-size: 20px;padding-left: 5px;padding-bottom: 2px;color: rgb(176,189,211);">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                        </svg>
+                    </span>
+                </a>
+                <p class="breadcrumb-forum-name" href="/forum/{{ forum_details.forum_id }}" style="padding-right: 4px; display: inline; font-size: 17px; color: rgb(176,189,211);">{{ forum_details.name }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="forum-parent" style="background: #212129;padding-top: 12px;padding-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col-xxl-7" style="width: 80%;">
+                <p class="forum-title" style="font-weight: bold;font-size: 26px;margin-bottom: 0px;">{{ forum_details.name }}</p>
+                <p class="forum-description" style="font-size: 16px;color: rgb(176,189,211);">{{ forum_details.description }}</p>
+            </div>
+        </div>
+        <div class="row mx-auto" style="margin-bottom: 12px;">
+            <div class="col-xxl-7" style="width: 100%;">
+                <div style="width: 100%; text-align: left;">
+                    <a id="start-new-topic-button" class="btn btn-primary shadow" style="display: none;" role="button" href="/post/create/{{ forum_details.forum_id }}">Start new topic</a>
+                </div>
+            </div>
+        </div>
+        {% for post in posts %}
+            <div class="row mx-auto forum-default" style="margin-bottom: 12px;">
+                <div style="width: 4%;margin-top: 2px;padding-left: 0px;padding-right: 0px;"><img src="{{ url_for('static', filename='img/brands/dot.png') }}" width="100%"></div>
+                <div style="padding-right: 0;padding-left: 0;padding-top: 4px;width: 66%;">
+                    <a class="post-title" href="/post/{{ post.id }}" style="font-weight: bold;margin-bottom: 0px;">{{ post.title }}</a>
+                    <p class="post-author-and-date" style="text-align: left;margin-bottom: 0px;color: rgb(176,189,211);">{{ post.author }}, {{ post.timestamp }}</p>
+                </div>
+                <div style="padding-top: 4px;width: 10%;max-width: 10%;">
+                    <p class="post-replies" style="text-align: left;margin-bottom: 0px;">{{ post.reply_count }}</p>
+                    <p class="post-replies-text" style="text-align: left;margin-bottom: 0;color: rgb(176,189,211);">{% if post.reply_count == 1 %}reply{% else %}replies{% endif %}</p>
+                </div>
+                <div style="padding-top: 4px;width: 20%;max-width: 20%;">
+                    <p class="post-recent-replier" style="margin-bottom: 0px;">{{ post.recent_reply_username }}</p>
+                    <p class="post-recent-replier-date" style="text-align: left;margin-bottom: 0px;color: rgb(176,189,211);">{{ post.recent_reply_timestamp }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/posts/post-like.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/posts/post-delete.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/posts/post-edit.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/posts/post-reply.js') }}"></script>
+
+    <script>
+        // reference: https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
+        // reason: force reload the page when navigating using history, ensures that the page is up to date
+        if(performance.navigation.type == 2)
+        {
+            location.reload(true);
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="background: #212129;padding-top: 12px;padding-bottom: 12px;margin-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col-xxl-7" style="width: 100%;">
+                <a class="breadcrumb-link" href="/forums" style="padding-right: 4px;">
+                    <span class="breadcrumb-home">
+                        Home
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-chevron-right" style="font-size: 20px;padding-left: 5px;padding-bottom: 2px;color: rgb(176,189,211);">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                        </svg>
+                    </span>
+                </a>
+                <a id="breadcrumb-forum-link" href="/forum/{{ forum_details.forum_id }}" style="padding-right: 4px;">
+                    <span id="breadcrumb-forum">
+                        {{ forum_details.name }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-chevron-right" style="font-size: 20px;padding-left: 5px;padding-bottom: 2px;color: rgb(176,189,211);">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                        </svg>
+                    </span>
+                </a>
+                <p id="breadcrumb-post" style="padding-right: 4px; display: inline; font-size: 17px; color: rgb(176,189,211);">{{ first_post.post_title }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="background: #212129;padding-top: 12px;padding-bottom: 12px;margin-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col-xxl-7" style="width: 100%;">
+                <p id="poster-title" style="font-weight: bold;font-size: 26px;">{{ first_post.post_title }}</p>
+            </div>
+        </div>
+        <div class="row mx-auto" style="margin-bottom: 12px;">
+            <div class="col-xxl-1" style="padding-right: 0;width: 5%;padding-left: 0px;"><img src="{{ url_for('static', filename='img/brands/dot.png') }}" width="60" height="60"></div>
+            <div class="col-xxl-7" style="padding-right: 0;padding-left: 0;padding-top: 4px;width: 95%;">
+                <p id="poster-username" style="text-align: left;margin-bottom: 0px;color: rgb(255,255,255);font-weight: bold;">{{ first_post.post_author.username }}</p>
+                <p id="poster-timestamp" style="text-align: left;margin-bottom: 0px;color: rgb(176,189,211);">{{ first_post.timestamp }}</p>
+            </div>
+        </div>
+    </div>
+    {% for post in posts %}
+        <div class="container post-default" style="padding-right: 0px;">
+            <div class="row mx-auto" style="margin-bottom: 12px;margin-left: 40px;margin-right: 40px;">
+                <div class="col" style="width: 10%;max-width: 10%;padding-top: 12px;min-width:60px;">
+                    <div class="row">
+                        <div class="col" style="text-align: center;"><img src="{{ url_for('static', filename='img/brands/dot.png') }}" width="60" height="60"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col" style="text-align: center;">
+                            <p class="post-username" style="text-align: center;margin-bottom: 0px;color: rgb(255,255,255);">{{ post.post_author.username }}</p>
+                            <p style="text-align: center;margin-bottom: 0px;color: rgb(176,189,211);">{% if post.post_author.admin == 1 %}Admin{% else %}Member{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col" style="background: #212129;">
+                            <p id="post-timestamp" style="color: rgb(176,189,211);margin-top: 16px;margin-right: 16px;margin-bottom: 16px;margin-left: 12px;">{{ post.timestamp }}</p>
+                            <p id="post-content-{{ post.post_id }}" style="color: rgb(255,255,255);margin-top: 16px;margin-right: 16px;margin-bottom: 16px;margin-left: 12px;">{{ post.post_content }}</p>
+                            <p id="post-edit-timestamp" style="color: rgb(176,189,211);margin-top: 16px;margin-right: 16px;margin-bottom: 4px;margin-left: 12px; text-align: right; font-style: italic; font-size: 14px; {% if post.edited == 0 %}display:none;{% endif %}">Edited: {{ post.edit_timestamp }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" style="background: #212129;">
+                            <hr style="margin-top: 1px;margin-bottom: 1px;margin-right: 12px;margin-left: 12px;">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" style="background: #212129; text-align: left;">
+                            <div id="options-{{ post.post_id }}" style="margin-top: 8px;">
+                                <a class="edit" href="{% if post.options %}javascript:edit_post({{ post.post_id }}{% endif %})" style="margin-left:12px; text-align: left; font-size: 16px; color: rgb(176,189,211); {% if not post.options %}display:none;{% endif %}">edit</a>
+                                <a class="delete" href="{% if post.admin %}javascript:delete_post({{ post.post_id }}{% endif %})" style="margin-left:12px; text-align: left; font-size: 16px; color: rgb(176,189,211); {% if not post.admin %}display:none;{% endif %}">delete</a>
+                            </div>
+                            <div id="edit-options-{{ post.post_id }}" style="display:none; margin-top: 8px">
+                                <a class="done" href="javascript:end_edit({{ post.post_id }});" style="margin-left:12px; text-align: left; font-size: 16px; color: rgb(176,189,211);">done</a>
+                                <a class="cancel" href="javascript:cancel_edit({{ post.post_id }});" style="margin-left:12px; text-align: left; font-size: 16px; color: rgb(176,189,211);">cancel</a>
+                            </div>
+                        </div>
+                        <div class="col" style="background: #212129;text-align: right;">
+                            <a class="post-like-button" href="javascript:send_like({{ post.post_id }})" style="margin-right: 24px;text-align: right;">
+                                <div style="display: inline;">
+                                    <span id="post-likes-{{ post.post_id }}" style="text-align: left;color: rgb(176,189,211);">{{ post.likes }}</span>
+                                </div>
+                                <div style="display: inline;">
+                                    <svg id="post-likes-heart-{{ post.post_id }}" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" style="font-size: 21px;margin-top: 12px;margin-bottom: 12px; {% if post.liked %}color: rgb(255, 255, 255);{% else %}color: rgb(176,189,211);{% endif %}margin-left: 6px;">
+                                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"></path>
+                                    </svg>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="container post-reply-default" style="padding-right: 0px;background: #212129;">
+        <div class="row mx-auto" style="margin-bottom: 12px;margin-left: 40px;margin-right: 40px;">
+            <div class="col" style="width: 5%;max-width: 5%;padding-top: 12px;">
+                <div class="row">
+                    <div class="col" style="text-align: center;padding-left: 0px;"><img src="{{ url_for('static', filename='img/brands/dot.png') }}" width="60" height="60"></div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <textarea id="post-reply-textarea" style="width: 98%;margin-top: 16px;margin-right: 16px;margin-bottom: 16px;margin-left: 6px;min-height: 150px;background: rgba(255,255,255,0);border-color: rgb(176,189,211);padding-left: 12px;padding-top: 12px; color:{% if not logged_in %}rgb(176,189,211){% else %}rgb(255,255,255){% endif %};" placeholder="Enter your reply..." {% if not logged_in %}disabled{% endif %}>{% if not logged_in %}You need to log in to reply...{% endif %}</textarea>
+                    </div>
+                </div>
+                <div class="row" id="invalid-reply" style="display: none;">
+                    <div class="col" style="background: #212129;text-align: right; margin-bottom:6px; margin-right:16px; margin-left:6px;">
+                        <div class="mb-3">
+                            <p id="invalid-reply-text" class="form-control" style="background-color: #FF7777; color:white; border-color: #FF7777; text-align: left;">&#8226; Error</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col" style="background: #212129;text-align: right;">
+                        <a class="btn btn-primary shadow post-reply-submit" role="button" href="javascript:reply({{ first_post.post_id }});" style="margin-right: 16px;background: rgb(55, 99, 244);margin-bottom: 16px;">Reply</a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}

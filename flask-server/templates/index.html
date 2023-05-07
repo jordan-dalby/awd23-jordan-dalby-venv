@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container" style="background: #212129;padding-top: 12px;padding-bottom: 12px;">
+        <div class="row mx-auto">
+            <div class="col-xxl-7" style="width: 100%;">
+                <p style="font-weight: bold;font-size: 26px;">Forums</p>
+            </div>
+        </div>
+        {% block forum_list %}
+            {% for forum in forums %}
+                <div class="forum-default row mx-auto" style="margin-bottom: 12px;">
+                    <div style="width: 6%;padding-right: 0;">
+                        <img src="{{ url_for('static', filename='img/brands/forum_icon.png') }}" width="100%" style="padding-right: 10px; padding-top: 2px;">
+                    </div>
+                    <div style="width: 64%;padding-right: 0;padding-left: 0;padding-top: 4px;">
+                        <a href="/forum/{{ forum.id }}" style="font-weight: bold;margin-bottom: 0px;">{{ forum.name }}</a>
+                        <p class="text-muted" style="text-align: left;margin-bottom: 0px;color:rgb(176,189,211);">{{ forum.description }}</p>
+                    </div>
+                    <div style="width: 10%;padding-top: 4px;">
+                        <p style="text-align: left;margin-bottom: 0px;">{{ forum.post_count }}</p>
+                        <p class="text-muted" style="text-align: left;margin-bottom: 0;">{% if forum.post_count == 1 %}post{% else %}posts{% endif %}</p>
+                    </div>
+                    <div class="forum-recent-post" style="width: 20%;padding-top: 4px;">
+                        <a href="/post/{{ forum.recent_post_id }}" style="margin-bottom: 0px;">{{ forum.recent_post_title }}</a>
+                        <p class="text-muted" style="text-align: left;margin-bottom: 0px;">{{ forum.recent_post_author }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endblock %}
+    </div>
+{% endblock %}
