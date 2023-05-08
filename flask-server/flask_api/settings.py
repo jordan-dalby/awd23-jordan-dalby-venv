@@ -6,7 +6,6 @@ import datetime
 import jwt
 
 templates_dir = os.path.abspath('templates')
-print(templates_dir)
 static_dir = os.path.abspath('static')
 
 server = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)

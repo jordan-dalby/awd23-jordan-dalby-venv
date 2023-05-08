@@ -1,0 +1,5 @@
+flask==2.3.2
+flask-mysql==1.5.2
+timeago==1.0.16
+bcrypt==4.0.1
+pyjwt==2.6.0
