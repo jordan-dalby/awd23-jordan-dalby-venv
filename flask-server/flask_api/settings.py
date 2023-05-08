@@ -5,9 +5,9 @@ from flask_api.views import not_found_view
 import datetime
 import jwt
 
-templates_dir = os.path.abspath('flask-server/templates')
+templates_dir = os.path.abspath('templates')
 print(templates_dir)
-static_dir = os.path.abspath('flask-server/static')
+static_dir = os.path.abspath('static')
 
 server = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
 
