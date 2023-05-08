@@ -1,5 +1,5 @@
 chmod 777 ./Scripts/activate
-chmod 777 ./Scripts/deactivate
+chmod 777 ./Scripts/deactivate.bat
 
 ./Scripts/activate
 cd flask-server
