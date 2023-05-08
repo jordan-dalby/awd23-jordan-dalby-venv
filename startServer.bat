@@ -1,3 +1,5 @@
 ./Scripts/activate.bat
-python ./flask-server/restServer-mvc.py
+cd ./flask-server
+python restServer-mvc.py
+cd ..
 ./Scripts/deactivate.bat
