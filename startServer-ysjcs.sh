@@ -5,4 +5,4 @@ chmod 777 ./Scripts/deactivate
 cd flask-server
 /usr/bin/python3 restServer-mvc.py
 cd ..
-./Scripts/deactivate
+./Scripts/deactivate.bat
